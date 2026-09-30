@@ -1,0 +1,457 @@
+{
+  "about": "Brew Haven scenario: 25 example customer responses and 25 staff check-ins for one day. Example data, not real guests.",
+  "ratings": [
+    {
+      "h": 7,
+      "m": 5,
+      "item": "Breakfast Sandwich",
+      "coffee": 4,
+      "speed": 5,
+      "atmosphere": 5,
+      "overall": 5,
+      "visit": "Morning",
+      "comment": ""
+    },
+    {
+      "h": 7,
+      "m": 40,
+      "item": "Latte",
+      "coffee": 3,
+      "speed": 5,
+      "atmosphere": 4,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": ""
+    },
+    {
+      "h": 8,
+      "m": 5,
+      "item": "Cold Brew",
+      "coffee": 5,
+      "speed": 3,
+      "atmosphere": 3,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": "Great cold brew, but there was nowhere to sit at 8am."
+    },
+    {
+      "h": 8,
+      "m": 15,
+      "item": "Caramel Latte",
+      "coffee": 4,
+      "speed": 4,
+      "atmosphere": 3,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": ""
+    },
+    {
+      "h": 8,
+      "m": 25,
+      "item": "Latte",
+      "coffee": 4,
+      "speed": 4,
+      "atmosphere": 3,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": ""
+    },
+    {
+      "h": 8,
+      "m": 40,
+      "item": "Caramel Latte",
+      "coffee": 4,
+      "speed": 2,
+      "atmosphere": 2,
+      "overall": 2,
+      "visit": "Morning",
+      "comment": "Waited almost 15 minutes for my caramel latte before work, and every table was taken."
+    },
+    {
+      "h": 8,
+      "m": 50,
+      "item": "Cappuccino",
+      "coffee": 5,
+      "speed": 3,
+      "atmosphere": 3,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": ""
+    },
+    {
+      "h": 9,
+      "m": 0,
+      "item": "Caramel Latte",
+      "coffee": 5,
+      "speed": 4,
+      "atmosphere": 4,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": "Caramel latte is the best in town!"
+    },
+    {
+      "h": 9,
+      "m": 10,
+      "item": "Blueberry Muffin",
+      "coffee": 5,
+      "speed": 2,
+      "atmosphere": 2,
+      "overall": 3,
+      "visit": "Morning",
+      "comment": "Line was out the door at 9. Tables were sticky and the bin was overflowing."
+    },
+    {
+      "h": 9,
+      "m": 25,
+      "item": "Cold Brew",
+      "coffee": 4,
+      "speed": 2,
+      "atmosphere": 2,
+      "overall": 3,
+      "visit": "Morning",
+      "comment": "Too loud and crowded during the morning rush to stay."
+    },
+    {
+      "h": 9,
+      "m": 35,
+      "item": "Chai Latte",
+      "coffee": 4,
+      "speed": 4,
+      "atmosphere": 4,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": ""
+    },
+    {
+      "h": 9,
+      "m": 50,
+      "item": "Cappuccino",
+      "coffee": 5,
+      "speed": 3,
+      "atmosphere": 3,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": "Coffee is excellent, but the morning rush feels chaotic."
+    },
+    {
+      "h": 9,
+      "m": 55,
+      "item": "Butter Croissant",
+      "coffee": 3,
+      "speed": 4,
+      "atmosphere": 3,
+      "overall": 3,
+      "visit": "Morning",
+      "comment": "Croissant was a bit dry."
+    },
+    {
+      "h": 10,
+      "m": 40,
+      "item": "Butter Croissant",
+      "coffee": 3,
+      "speed": 5,
+      "atmosphere": 4,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": ""
+    },
+    {
+      "h": 11,
+      "m": 15,
+      "item": "Latte",
+      "coffee": 4,
+      "speed": 5,
+      "atmosphere": 4,
+      "overall": 4,
+      "visit": "Morning",
+      "comment": ""
+    },
+    {
+      "h": 11,
+      "m": 50,
+      "item": "Chai Latte",
+      "coffee": 4,
+      "speed": 5,
+      "atmosphere": 5,
+      "overall": 5,
+      "visit": "Morning",
+      "comment": "Lovely and calm late morning, great spot to work. More outlets please."
+    },
+    {
+      "h": 12,
+      "m": 30,
+      "item": "Caramel Latte",
+      "coffee": 5,
+      "speed": 4,
+      "atmosphere": 4,
+      "overall": 4,
+      "visit": "Afternoon",
+      "comment": ""
+    },
+    {
+      "h": 13,
+      "m": 20,
+      "item": "Butter Croissant",
+      "coffee": 4,
+      "speed": 5,
+      "atmosphere": 4,
+      "overall": 5,
+      "visit": "Afternoon",
+      "comment": ""
+    },
+    {
+      "h": 14,
+      "m": 5,
+      "item": "Caramel Latte",
+      "coffee": 4,
+      "speed": 3,
+      "atmosphere": 3,
+      "overall": 3,
+      "visit": "Afternoon",
+      "comment": "Afternoon rush was hectic, only two people behind the counter."
+    },
+    {
+      "h": 14,
+      "m": 15,
+      "item": "Caramel Latte",
+      "coffee": 5,
+      "speed": 4,
+      "atmosphere": 4,
+      "overall": 5,
+      "visit": "Afternoon",
+      "comment": "Would love an iced caramel latte or an oat milk version."
+    },
+    {
+      "h": 14,
+      "m": 30,
+      "item": "Cappuccino",
+      "coffee": 5,
+      "speed": 3,
+      "atmosphere": 3,
+      "overall": 4,
+      "visit": "Afternoon",
+      "comment": "Seats near the door get cold every time it opens."
+    },
+    {
+      "h": 14,
+      "m": 40,
+      "item": "Cold Brew",
+      "coffee": 5,
+      "speed": 3,
+      "atmosphere": 3,
+      "overall": 4,
+      "visit": "Afternoon",
+      "comment": ""
+    },
+    {
+      "h": 14,
+      "m": 55,
+      "item": "Caramel Latte",
+      "coffee": 3,
+      "speed": 4,
+      "atmosphere": 4,
+      "overall": 4,
+      "visit": "Afternoon",
+      "comment": ""
+    },
+    {
+      "h": 16,
+      "m": 10,
+      "item": "Latte",
+      "coffee": 5,
+      "speed": 4,
+      "atmosphere": 4,
+      "overall": 5,
+      "visit": "Afternoon",
+      "comment": "Do you have a loyalty card? I'm here almost every day."
+    },
+    {
+      "h": 17,
+      "m": 30,
+      "item": "Caramel Latte",
+      "coffee": 3,
+      "speed": 5,
+      "atmosphere": 5,
+      "overall": 5,
+      "visit": "Evening",
+      "comment": "Quiet and cozy in the evening. Would come more often with an evening deal."
+    }
+  ],
+  "checkins": [
+    {
+      "h": 6,
+      "m": 30,
+      "level": 1,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 7,
+      "m": 0,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 7,
+      "m": 30,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 8,
+      "m": 0,
+      "level": 3,
+      "staff": 3,
+      "note": ""
+    },
+    {
+      "h": 8,
+      "m": 30,
+      "level": 4,
+      "staff": 3,
+      "note": "Line out the door"
+    },
+    {
+      "h": 9,
+      "m": 0,
+      "level": 4,
+      "staff": 3,
+      "note": "No free tables"
+    },
+    {
+      "h": 9,
+      "m": 30,
+      "level": 3,
+      "staff": 3,
+      "note": ""
+    },
+    {
+      "h": 10,
+      "m": 0,
+      "level": 2,
+      "staff": 3,
+      "note": ""
+    },
+    {
+      "h": 10,
+      "m": 30,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 11,
+      "m": 0,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 11,
+      "m": 30,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 12,
+      "m": 0,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 12,
+      "m": 30,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 13,
+      "m": 0,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 13,
+      "m": 30,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 14,
+      "m": 0,
+      "level": 3,
+      "staff": 2,
+      "note": "School pickup crowd"
+    },
+    {
+      "h": 14,
+      "m": 30,
+      "level": 4,
+      "staff": 2,
+      "note": "Only 2 on, line of 12"
+    },
+    {
+      "h": 15,
+      "m": 0,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 15,
+      "m": 30,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 16,
+      "m": 0,
+      "level": 1,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 16,
+      "m": 30,
+      "level": 2,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 17,
+      "m": 0,
+      "level": 1,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 17,
+      "m": 30,
+      "level": 1,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 18,
+      "m": 0,
+      "level": 1,
+      "staff": 2,
+      "note": ""
+    },
+    {
+      "h": 18,
+      "m": 30,
+      "level": 1,
+      "staff": 2,
+      "note": ""
+    }
+  ]
+}

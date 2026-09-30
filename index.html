@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Brew Haven customer feedback, staff check-ins and owner dashboard.">
+<title>Brew Haven Feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one-column phone app — roasted-brown header band, three views, fixed bottom tab bar; centers at 720px on desktop */
+:root {
+  --bg: #F6EEE4;          /* steamed milk */
+  --surface: #FFFBF6;
+  --sunk: #EFE1D1;
+  --ink: #3A2317;         /* dark roast */
+  --muted: #7B6150;
+  --line: #E4D2BF;
+  --roast: #4A2A19;       /* header band */
+  --roast-ink: #FBEBDA;
+  --accent: #B4561A;      /* burnt orange */
+  --accent-ink: #FFFFFF;
+  --accent-soft: #F7DCC3;
+  --star: #E38A1C;
+  --star-empty: #DCCAB6;
+  --good: #3C7A4B; --warn: #B7791F; --bad: #A83A25;
+  --lvl1: #D6C0A2; --lvl2: #E4A159; --lvl3: #CC6424; --lvl4: #8C2C19;
+  --f-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --r: 16px;
+  --tabbar-h: 68px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #19110C; --surface: #241912; --sunk: #2F2219; --ink: #F4E6D6; --muted: #B39A85; --line: #3F2F23;
+    --roast: #2C1C12; --roast-ink: #F4E1CB;
+    --accent: #F0924A; --accent-ink: #2A1509; --accent-soft: #43281A;
+    --star: #F5A845; --star-empty: #4E3D30;
+    --good: #7CC790; --warn: #E7AE52; --bad: #EE7F66;
+    --lvl1: #6F5A48; --lvl2: #C98B4C; --lvl3: #EA7A38; --lvl4: #EE5B45;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #19110C; --surface: #241912; --sunk: #2F2219; --ink: #F4E6D6; --muted: #B39A85; --line: #3F2F23;
+  --roast: #2C1C12; --roast-ink: #F4E1CB;
+  --accent: #F0924A; --accent-ink: #2A1509; --accent-soft: #43281A;
+  --star: #F5A845; --star-empty: #4E3D30;
+  --good: #7CC790; --warn: #E7AE52; --bad: #EE7F66;
+  --lvl1: #6F5A48; --lvl2: #C98B4C; --lvl3: #EA7A38; --lvl4: #EE5B45;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--bg); color: var(--ink); }
+body { font: 17px/1.5 var(--f-body); padding: 0 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 28px); }
+.wrap { max-width: 720px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.15; }
+h2 { font-size: 1.65rem; }
+h3 { font-size: 1.2rem; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.eyebrow { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--accent); }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* header */
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--roast); color: var(--roast-ink); margin: 0 -16px; padding: 14px 16px; }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 32px; height: 32px; flex: none; }
+.brand h1 { font-size: 1.4rem; }
+.brand small { display: block; font: 500 .7rem var(--f-body); letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+.status { font-size: .75rem; display: flex; align-items: center; gap: 6px; text-align: right; opacity: .9; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .6; flex: none; }
+.dot.live { background: #7CC790; opacity: 1; }
+.dot.local { background: #F5A845; opacity: 1; }
+
+main { display: grid; gap: 20px; padding-block: 22px; }
+section.view { display: grid; gap: 18px; }
+.intro { display: grid; gap: 6px; }
+
+/* cards & forms */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 16px; min-width: 0; }
+.field { display: grid; gap: 6px; font-weight: 600; font-size: .95rem; }
+.opt { font-weight: 400; color: var(--muted); }
+select, textarea, input[type="text"] {
+  font: inherit; font-size: 1rem; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px; padding: 14px; width: 100%; min-height: 52px;
+}
+textarea { min-height: 96px; resize: vertical; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.row2 { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .row2 { grid-template-columns: 1fr 1fr; } }
+
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.chips input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chips label { display: grid; justify-items: center; gap: 2px; text-align: center; padding: 12px 6px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--bg); cursor: pointer; font-weight: 600; min-height: 56px; }
+.chips label span { font-size: .75rem; font-weight: 400; color: var(--muted); }
+.chips input:checked + label { border-color: var(--accent); background: var(--accent-soft); }
+.chips input:focus-visible + label { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.rate-row { display: grid; gap: 2px; padding-block: 12px; border-top: 1px solid var(--line); }
+.rate-row:first-of-type { border-top: 0; padding-top: 0; }
+.rate-row legend { font-weight: 700; padding: 0; }
+.rate-row .hint { font-size: .85rem; color: var(--muted); }
+.stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 2px; }
+.stars input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.stars label { font-size: 2.6rem; line-height: 1; color: var(--star-empty); cursor: pointer; padding: 4px 4px; transition: color .12s, transform .12s; user-select: none; }
+.stars label:hover, .stars label:hover ~ label, .stars input:checked ~ label { color: var(--star); }
+.stars input:focus-visible + label { outline: 3px solid var(--accent); border-radius: 6px; }
+.stars label:active { transform: scale(.9); }
+.star-word { font-size: .85rem; color: var(--muted); min-height: 1.3em; }
+
+.btn { font: 700 1.1rem var(--f-body); border: 0; border-radius: 14px; padding: 16px 24px; cursor: pointer; background: var(--accent); color: var(--accent-ink); min-height: 58px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+.btn.small { padding: 8px 16px; min-height: 40px; font-size: .9rem; border-radius: 999px; }
+.btn.block { width: 100%; }
+.note { font-size: .88rem; color: var(--muted); }
+.error { color: var(--bad); font-size: .92rem; }
+
+.thanks { text-align: center; padding-block: 40px; justify-items: center; }
+.thanks svg { width: 76px; height: 76px; }
+
+/* staff */
+.stepper { display: flex; align-items: center; gap: 14px; }
+.stepper button { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); color: var(--ink); font-size: 1.5rem; cursor: pointer; }
+.stepper output { font: 500 1.6rem var(--f-mono); min-width: 2.5ch; text-align: center; }
+.clock { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.clock .num { font-size: 1.5rem; }
+.quick { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.quick button { font: 700 1.08rem var(--f-body); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 16px; padding: 16px 14px; min-height: 96px; cursor: pointer; display: grid; align-content: space-between; justify-items: start; gap: 8px; text-align: left; position: relative; overflow: hidden; }
+.quick button::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--c); }
+.quick button span { font-size: .8rem; font-weight: 400; color: var(--muted); }
+.quick button:active { transform: scale(.98); }
+.quick button:disabled { opacity: .45; cursor: not-allowed; }
+@media (max-width: 360px) { .quick { grid-template-columns: 1fr; } }
+
+.log { list-style: none; margin: 0; padding: 0; display: grid; }
+.log li { display: grid; grid-template-columns: 4.6rem 1fr auto; gap: 12px; align-items: center; padding-block: 10px; border-top: 1px solid var(--line); }
+.log li:first-child { border-top: 0; }
+.log .when { font-family: var(--f-mono); font-size: .85rem; color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--sunk); white-space: nowrap; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; flex: none; display: inline-block; }
+
+/* dashboard */
+.dash-head { display: grid; gap: 12px; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--sunk); border-radius: 999px; padding: 4px; justify-self: start; }
+.seg button { font: 600 .9rem var(--f-body); border: 0; background: transparent; color: var(--muted); padding: 8px 14px; border-radius: 999px; cursor: pointer; min-height: 38px; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .14); }
+.banner { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; font-size: .92rem; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+
+.overall { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; }
+.big { font: 400 3.6rem/1 var(--f-display); }
+.cats { display: grid; gap: 10px; }
+.cat { display: grid; grid-template-columns: 8.5rem 1fr 2.6rem; gap: 10px; align-items: center; font-size: .92rem; }
+.meter { height: 10px; background: var(--sunk); border-radius: 999px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--star); border-radius: 999px; }
+.cat.low .meter i { background: var(--bad); }
+.cat.low span:first-child { font-weight: 700; }
+@media (max-width: 440px) { .overall { grid-template-columns: 1fr; } .cat { grid-template-columns: 7.4rem 1fr 2.4rem; } }
+.visit-split { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.insight-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .insight-grid { grid-template-columns: 1fr 1fr; } }
+.insight { display: grid; gap: 8px; align-content: start; background: var(--bg); border-radius: 12px; padding: 14px; min-width: 0; }
+.insight h4 { margin: 0; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
+.insight.pop h4 { color: var(--good); }
+.insight.fix h4 { color: var(--bad); }
+.insight.staff h4 { color: var(--accent); }
+.insight ol, .insight ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; font-size: .95rem; }
+.insight.staff { grid-column: 1 / -1; }
+
+.chart-wrap { overflow-x: auto; }
+.chart-wrap svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .8rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.periods { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.periods li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center; }
+.peak-callout { font-size: 1rem; }
+.peak-callout strong { font-family: var(--f-display); font-weight: 400; font-size: 1.25rem; color: var(--accent); }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .94rem; }
+th { text-align: left; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 0 8px 8px 0; }
+td { padding: 10px 8px 10px 0; border-top: 1px solid var(--line); }
+td.r, th.r { text-align: right; }
+.mini-stars { color: var(--star); letter-spacing: 1px; white-space: nowrap; }
+.mini-stars .off { color: var(--star-empty); }
+
+.quotes { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.quotes li { border-left: 3px solid var(--star); padding-left: 12px; display: grid; gap: 2px; }
+.quotes q { font-family: var(--f-display); font-size: 1.05rem; quotes: "“" "”"; }
+.quotes small { color: var(--muted); }
+
+.empty { text-align: center; padding-block: 30px; display: grid; gap: 12px; justify-items: center; color: var(--muted); }
+
+/* tab bar */
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); }
+nav.tabs .wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+nav.tabs button { font: 700 .76rem var(--f-body); background: transparent; border: 0; color: var(--muted); display: grid; justify-items: center; gap: 3px; padding: 6px; border-radius: 12px; cursor: pointer; min-height: 56px; }
+nav.tabs button svg { width: 24px; height: 24px; }
+nav.tabs button[aria-selected="true"] { color: var(--accent); background: var(--accent-soft); }
+
+.toast { position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 16px); transform: translateX(-50%); background: var(--roast); color: var(--roast-ink); padding: 12px 20px; border-radius: 999px; font-weight: 600; font-size: .95rem; z-index: 20; max-width: calc(100% - 32px); text-align: center; }
+/* order timer */
+.timer-start { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+.quick-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.orders { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.orders li { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px; align-items: center; background: var(--bg); border-radius: 12px; padding: 10px 12px; }
+.orders li.o-empty { display: block; background: transparent; padding: 0; }
+.o-item { display: grid; font-weight: 600; min-width: 0; }
+.o-item small { font-weight: 400; color: var(--muted); font-size: .78rem; }
+.o-time { font-size: 1.3rem; }
+.o-time.over { color: var(--bad); }
+.o-x { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); background: transparent; color: var(--muted); font-size: 1.2rem; cursor: pointer; }
+.pill.good { color: var(--good); } .pill.warn { color: var(--warn); } .pill.bad { color: var(--bad); }
+
+/* roi */
+.roi-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.roi-inputs label { display: grid; gap: 4px; font-size: .8rem; font-weight: 600; color: var(--muted); align-content: end; }
+.roi-inputs .inp { display: flex; align-items: center; gap: 4px; background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: 0 10px; color: var(--muted); }
+.roi-inputs input { font: 500 1rem var(--f-mono); border: 0; background: transparent; color: var(--ink); width: 100%; min-height: 44px; padding: 0; }
+.roi-inputs .inp:focus-within { outline: 3px solid var(--accent); outline-offset: 1px; }
+.roi-inputs input:focus-visible { outline: 0; }
+table.roi td { vertical-align: top; }
+.roi .amt { text-align: right; font-family: var(--f-mono); white-space: nowrap; }
+.roi .amt.pos { color: var(--good); } .roi .amt.neg { color: var(--bad); }
+.roi .detail { display: block; font-size: .8rem; color: var(--muted); }
+.roi-total { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.roi-total div { background: var(--bg); border-radius: 12px; padding: 12px; display: grid; gap: 2px; min-width: 0; }
+.roi-total span { font-size: .78rem; color: var(--muted); font-weight: 600; }
+.roi-total b { font: 400 1.5rem var(--f-display); }
+
+/* ideas */
+.plan { background: var(--roast); color: var(--roast-ink); border: 0; }
+.plan .eyebrow { color: var(--star); }
+.plan h3 { font-size: 1.45rem; }
+.plan .why { opacity: .85; font-size: .95rem; }
+.plan ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.idea-group { display: grid; gap: 12px; }
+.idea-group > header { display: flex; align-items: center; gap: 10px; }
+.idea-group > header svg { width: 26px; height: 26px; flex: none; }
+.idea { display: grid; gap: 8px; padding-block: 14px; border-top: 1px solid var(--line); }
+.idea:first-of-type { border-top: 0; padding-top: 0; }
+.idea-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between; }
+.idea h4 { margin: 0; font-size: 1.05rem; }
+.idea .why { font-size: .92rem; color: var(--muted); }
+.idea .why b { color: var(--ink); font-weight: 600; }
+.idea ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; font-size: .95rem; }
+.tag { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.tag.quick { background: var(--accent-soft); color: var(--accent); }
+.tag.month { background: var(--sunk); color: var(--ink); }
+.tag.big { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+.plan .tag.quick { background: var(--star); color: var(--roast); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<style>body { margin: 0; } img { max-width: 100%; } :root { padding-top: env(safe-area-inset-top, 0px); }</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 12h17v7a7 7 0 0 1-7 7h-3a7 7 0 0 1-7-7z" fill="var(--roast-ink)"/><path d="M23 14h2a3 3 0 0 1 0 6h-2" fill="none" stroke="var(--roast-ink)" stroke-width="2.4"/><path d="M11 4c-1.5 2 1.5 3 0 5M16 4c-1.5 2 1.5 3 0 5" fill="none" stroke="var(--star)" stroke-width="2" stroke-linecap="round"/></svg>
+      <div><h1>Brew Haven</h1><small>Coffee house</small></div>
+    </div>
+    <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">Connecting…</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- CUSTOMER FEEDBACK -->
+  <section class="view" id="view-rate" aria-labelledby="rateTitle">
+    <div class="intro">
+      <p class="eyebrow">Customer feedback</p>
+      <h2 id="rateTitle">How was your visit today?</h2>
+      <p class="muted">Takes about 30 seconds. Sarah reads every one.</p>
+    </div>
+
+    <form class="card" id="rateForm" novalidate>
+      <label class="field" for="ordered">What did you order today?
+        <select id="ordered"></select>
+      </label>
+
+      <div id="starRows"></div>
+
+      <label class="field" for="item">Favorite menu item
+        <select id="item"></select>
+      </label>
+
+      <label class="field" for="visit">Time of visit
+        <select id="visit">
+          <option value="Morning">Morning (open – 11:59 AM)</option>
+          <option value="Afternoon">Afternoon (12 – 4:59 PM)</option>
+          <option value="Evening">Evening (5 PM – close)</option>
+        </select>
+      </label>
+
+      <label class="field" for="comment">Comments <span class="opt">(optional)</span>
+        <textarea id="comment" maxlength="500" placeholder="What should we keep doing, or fix?"></textarea>
+      </label>
+
+      <button class="btn block" type="submit" id="rateSubmit" disabled>Send feedback</button>
+      <p class="note" id="rateNote" aria-live="polite">Tap the stars to rate each area.</p>
+      <p class="error" id="rateError" hidden></p>
+    </form>
+
+    <div class="card thanks" id="thanks" hidden>
+      <svg viewBox="0 0 76 76" aria-hidden="true"><circle cx="38" cy="38" r="36" fill="var(--accent-soft)"/><path d="M24 39l10 10 19-21" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h2>Thank you for your feedback!</h2>
+      <p class="muted">It goes straight to the Brew Haven team and helps us plan the menu and the schedule. See you again soon.</p>
+      <button class="btn ghost" type="button" id="againBtn">Leave another response</button>
+      <p class="note">This screen resets for the next guest in <span id="countdown">10</span>s.</p>
+    </div>
+  </section>
+
+  <!-- STAFF CHECK-IN -->
+  <section class="view" id="view-staff" aria-labelledby="staffTitle" hidden>
+    <div class="intro">
+      <p class="eyebrow">Staff check-in</p>
+      <h2 id="staffTitle">How busy is it right now?</h2>
+      <p class="muted">One tap logs it. Check in every 30–60 minutes or whenever the pace changes.</p>
+    </div>
+
+    <div class="card">
+      <div class="clock">
+        <span class="field" style="font-weight:600">Current time</span>
+        <span class="num" id="clock" aria-live="off">–</span>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <span id="staffLbl">Staff on duty</span>
+          <div class="stepper" role="group" aria-labelledby="staffLbl">
+            <button type="button" id="staffMinus" aria-label="One fewer staff member">−</button>
+            <output id="staffOut" class="num" aria-live="polite">2</output>
+            <button type="button" id="staffPlus" aria-label="One more staff member">+</button>
+          </div>
+        </div>
+        <label class="field" for="staffNote">Special notes <span class="opt">(optional)</span>
+          <input type="text" id="staffNote" maxlength="140" placeholder="Out of oat milk, tour group, espresso machine down…">
+        </label>
+      </div>
+      <div class="quick" id="quick" role="group" aria-label="Log the current pace"></div>
+      <p class="error" id="staffError" hidden></p>
+    </div>
+
+    <div class="card" id="timerCard">
+      <div class="card-head">
+        <h3>Order timer</h3><span class="note num" id="ordersToday"></span>
+      </div>
+      <p class="note">Tap a drink when you start making it and <strong>Ready</strong> when it's handed off. The dashboard averages these into prep times.</p>
+      <div class="quick-items" id="quickItems" role="group" aria-label="Start timing a common drink"></div>
+      <div class="timer-start">
+        <select id="orderItem" aria-label="Any menu item"></select>
+        <button class="btn" type="button" id="orderStart">Start</button>
+      </div>
+      <ul class="orders" id="activeOrders"></ul>
+      <p class="error" id="orderError" hidden></p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Today's check-ins</h3><span class="note num" id="todayCount"></span>
+      </div>
+      <ul class="log" id="todayLog"></ul>
+    </div>
+  </section>
+
+  <!-- OWNER DASHBOARD -->
+  <section class="view" id="view-dash" aria-labelledby="dashTitle" hidden>
+    <div class="dash-head">
+      <div class="intro">
+        <p class="eyebrow">Owner dashboard</p>
+        <h2 id="dashTitle">Today at Brew Haven</h2>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <div class="seg" role="group" aria-label="Date range">
+        <button type="button" data-range="today" aria-pressed="true">Today</button>
+        <button type="button" data-range="7" aria-pressed="false">7 days</button>
+        <button type="button" data-range="30" aria-pressed="false">30 days</button>
+        <button type="button" data-range="0" aria-pressed="false">All time</button>
+      </div>
+      <button class="btn small ghost" type="button" data-scenario="toggle" id="scenarioBtn">Scenario data</button>
+      </div>
+    </div>
+
+    <div class="banner" id="sampleBanner" hidden>
+      <span><strong>Scenario data.</strong> 25 example responses and a day of check-ins, not real guests.</span>
+      <button class="btn small ghost" type="button" data-scenario="off">Show real data</button>
+    </div>
+
+    <div id="dashEmpty" class="card empty" hidden>
+      <h3 style="color:var(--ink)">No feedback yet</h3>
+      <p>Guest ratings from the Feedback tab and check-ins from the Staff tab will show up here as they come in.</p>
+      <button class="btn small ghost" type="button" data-scenario="on">Load the Brew Haven scenario</button>
+    </div>
+
+    <div id="dashBody" style="display:grid;gap:18px">
+      <!-- 1. Feedback summary -->
+      <div class="card">
+        <div class="card-head">
+          <h3 id="sumTitle">Today's feedback</h3><span class="note num" id="ratingCount"></span>
+        </div>
+        <div class="overall">
+          <div>
+            <div class="big num" id="overallNum">–</div>
+            <div class="mini-stars" id="overallStars" aria-hidden="true"></div>
+            <div class="note">overall experience</div>
+          </div>
+          <div class="cats" id="cats"></div>
+        </div>
+        <div class="visit-split" id="visitSplit"></div>
+      </div>
+
+      <!-- 3. Quick insights -->
+      <div class="card">
+        <h3>Quick insights</h3>
+        <div class="insight-grid">
+          <div class="insight pop"><h4>Most popular menu items</h4><ol id="popList"></ol></div>
+          <div class="insight fix"><h4>Areas for improvement</h4><ul id="fixList"></ul></div>
+          <div class="insight staff" id="staffInsightBox"><h4>Staffing</h4><ul id="staffList"></ul></div>
+        </div>
+      </div>
+
+      <!-- 2. Traffic patterns -->
+      <div class="card">
+        <div class="card-head">
+          <h3>Busy periods logged today</h3><span class="note num" id="todayCheckins"></span>
+        </div>
+        <div class="chart-wrap" id="todayStrip"></div>
+        <ul class="periods" id="periods"></ul>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Peak hours</h3><span class="note num" id="checkinCount"></span>
+        </div>
+        <p class="peak-callout" id="peakCallout"></p>
+        <div class="chart-wrap" id="hourChart"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Drink prep times</h3><span class="note num" id="orderCount"></span>
+        </div>
+        <p class="peak-callout" id="prepCallout"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th class="r">Orders</th><th class="r">Avg</th><th class="r">Target</th><th class="r">At peak</th><th>Status</th></tr></thead>
+            <tbody id="prepRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Recent comments</h3>
+        <ul class="quotes" id="quotes"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- IDEAS -->
+  <section class="view" id="view-ideas" aria-labelledby="ideasTitle" hidden>
+    <div class="intro">
+      <p class="eyebrow">Suggestions</p>
+      <h2 id="ideasTitle">What to do next</h2>
+      <p class="muted" id="ideasBasis">Suggestions come from the survey ratings, comments and staff check-ins, and update as new feedback arrives.</p>
+    </div>
+    <div class="banner" id="ideasBanner" hidden>
+      <span><strong>Scenario data.</strong> Built from the 25 example responses.</span>
+      <button class="btn small ghost" type="button" data-scenario="off">Show real data</button>
+    </div>
+    <div id="ideasEmpty" class="card empty" hidden>
+      <h3 style="color:var(--ink)">Not enough feedback yet</h3>
+      <p>Suggestions appear once a few guests have rated their visit.</p>
+      <button class="btn small ghost" type="button" data-scenario="on">Load the Brew Haven scenario</button>
+    </div>
+    <div id="ideasBody" style="display:grid;gap:18px"></div>
+    <div class="card" id="roiCard" hidden>
+      <div class="card-head">
+        <h3>ROI estimate</h3><span class="note">per month, from better staffing and inventory</span>
+      </div>
+      <p class="note">Peak and slow hours come from the staff check-ins. Everything else is an assumption: change it to Brew Haven's real numbers from the till and payroll.</p>
+      <div class="roi-inputs" id="roiInputs"></div>
+      <div class="table-wrap"><table class="roi"><tbody id="roiRows"></tbody></table></div>
+      <div class="roi-total" id="roiTotal"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <div class="wrap">
+    <button role="tab" id="tab-rate" data-view="rate" aria-selected="true" aria-controls="view-rate">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Feedback
+    </button>
+    <button role="tab" id="tab-staff" data-view="staff" aria-selected="false" aria-controls="view-staff">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Staff
+    </button>
+    <button role="tab" id="tab-dash" data-view="dash" aria-selected="false" aria-controls="view-dash">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Dashboard
+    </button>
+    <button role="tab" id="tab-ideas" data-view="ideas" aria-selected="false" aria-controls="view-ideas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Ideas
+    </button>
+  </div>
+</nav>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const CATS = [
+    { key: "coffee", label: "Coffee quality", hint: "Taste, temperature, how it was made" },
+    { key: "speed", label: "Service speed", hint: "How long you waited to order and be served" },
+    { key: "atmosphere", label: "Atmosphere", hint: "Seating, music, cleanliness" },
+    { key: "overall", label: "Overall experience", hint: "Would you come back?" },
+  ];
+  const STAR_WORDS = ["", "Poor", "Below par", "Okay", "Good", "Excellent"];
+  const LEVELS = [
+    { v: 1, name: "Slow period", desc: "Empty counter, time to restock", color: "var(--lvl1)" },
+    { v: 2, name: "Moderate traffic", desc: "Steady orders, no real wait", color: "var(--lvl2)" },
+    { v: 3, name: "Very busy", desc: "Line forming, tickets stacking", color: "var(--lvl3)" },
+    { v: 4, name: "Rush period", desc: "Line out the door, all hands", color: "var(--lvl4)" },
+  ];
+  const VISITS = ["Morning", "Afternoon", "Evening"];
+  // [name, target make time in seconds]
+  const MENU = [
+    ["Espresso bar", [["Espresso", 90], ["Americano", 120], ["Cappuccino", 180], ["Flat White", 180], ["Latte", 180], ["Caramel Latte", 210], ["Mocha", 210]]],
+    ["Slow bar & cold", [["Pour-over", 300], ["Cold Brew", 60], ["Iced Latte", 150]]],
+    ["Not coffee", [["Chai Latte", 180], ["Matcha Latte", 180], ["Hot Chocolate", 180], ["Loose-leaf Tea", 120]]],
+    ["Bakery case", [["Butter Croissant", 60], ["Blueberry Muffin", 45], ["Banana Bread", 45], ["Breakfast Sandwich", 240]]],
+  ];
+  const TARGET = Object.fromEntries(MENU.flatMap(([, items]) => items));
+  const menuOptions = (placeholder) => `<option value="">${placeholder}</option>` +
+    MENU.map(([g, items]) => `<optgroup label="${g.replace("&", "&amp;")}">${items.map(([n]) => `<option>${n}</option>`).join("")}</optgroup>`).join("");
+  const OPEN = 6, CLOSE = 20; // hours shown on charts: 6 AM – 8 PM
+
+  const state = { ratings: [], checkins: [], orders: [], range: "today", sample: false, canWrite: true, ready: false };
+
+  /* ---------- storage: shared db when available, this device otherwise ---------- */
+  const store = {
+    mode: "pending", db: null, mem: { ratings: [], checkins: [] }, listeners: {},
+    readLocal(c) { try { return JSON.parse(localStorage.getItem("bh-" + c) || "[]"); } catch { return this.mem[c] || []; } },
+    writeLocal(c, rows) { this.mem[c] = rows; try { localStorage.setItem("bh-" + c, JSON.stringify(rows)); } catch {} },
+    subscribe(c, cb) {
+      if (this.mode === "db") {
+        this.db.collection(c).orderBy("ts", "desc").limit(1000).onSnapshot(
+          (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+          () => setStatus("error")
+        );
+      } else { this.listeners[c] = cb; cb(this.readLocal(c)); }
+    },
+    async add(c, data) {
+      if (this.mode === "db") { await this.db.collection(c).add(data); return; }
+      const rows = [{ id: "l" + Date.now(), ...data }, ...this.readLocal(c)].slice(0, 1000);
+      this.writeLocal(c, rows);
+      this.listeners[c]?.(rows);
+    },
+  };
+
+  function setStatus(kind) {
+    const dot = $("statusDot"), txt = $("statusText");
+    dot.className = "dot";
+    if (kind === "db") { dot.classList.add("live"); txt.textContent = "Live, shared"; }
+    else if (kind === "local") { dot.classList.add("local"); txt.textContent = "Saved on this device"; }
+    else if (kind === "readonly") { dot.classList.add("local"); txt.textContent = "View only"; }
+    else if (kind === "error") { txt.textContent = "Connection lost"; }
+  }
+
+  function startSubscriptions() {
+    store.subscribe("ratings", (rows) => { state.ratings = rows; state.ready = true; renderAll(); });
+    store.subscribe("checkins", (rows) => { state.checkins = rows; state.ready = true; renderAll(); });
+    store.subscribe("orders", (rows) => { state.orders = rows; renderAll(); });
+    updateRateButton(); updateQuick();
+  }
+  async function connect() {
+    let db = null, user = null;
+    if (window.claude?.use) [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (db) {
+      store.mode = "db"; store.db = db; setStatus("db");
+      const can = user ? await user.can("data.write") : null;
+      if (can === false) { state.canWrite = false; setStatus("readonly"); }
+    } else { store.mode = "local"; setStatus("local"); }
+    startSubscriptions();
+  }
+
+  /* ---------- tabs ---------- */
+  const VIEWS = ["rate", "staff", "dash", "ideas"];
+  function show(view) {
+    if (!VIEWS.includes(view)) view = "rate";
+    VIEWS.forEach((v) => { $("view-" + v).hidden = v !== view; $("tab-" + v).setAttribute("aria-selected", String(v === view)); });
+    try { localStorage.setItem("bh-tab", view); } catch {}
+    if (view === "dash") renderDash();
+    if (view === "ideas") renderIdeas();
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll("nav.tabs button").forEach((b) => b.addEventListener("click", () => show(b.dataset.view)));
+
+  /* ---------- customer feedback form ---------- */
+  const visitNow = () => { const h = new Date().getHours(); return h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening"; };
+  $("visit").value = visitNow();
+  $("starRows").innerHTML = CATS.map((c) => {
+    let s = `<fieldset class="rate-row"><legend>${c.label}</legend><span class="hint">${c.hint}</span><div class="stars">`;
+    for (let i = 5; i >= 1; i--) s += `<input type="radio" name="${c.key}" id="${c.key}-${i}" value="${i}"><label for="${c.key}-${i}" aria-label="${i} star${i > 1 ? "s" : ""}, ${STAR_WORDS[i]}">★</label>`;
+    return s + `</div><span class="star-word" id="${c.key}-word"></span></fieldset>`;
+  }).join("");
+  $("ordered").innerHTML = menuOptions("Choose what you had");
+  $("item").innerHTML = menuOptions("Choose one");
+  const form = $("rateForm");
+  const getStars = (k) => Number(form.querySelector(`input[name="${k}"]:checked`)?.value || 0);
+  function updateRateButton() {
+    CATS.forEach((c) => { const v = getStars(c.key); $(c.key + "-word").textContent = v ? STAR_WORDS[v] : ""; });
+    const missing = $("ordered").value ? [] : ["what you ordered"];
+    CATS.forEach((c) => { if (!getStars(c.key)) missing.push(c.label.toLowerCase()); });
+    if (!$("item").value) missing.push("favorite menu item");
+    $("rateSubmit").disabled = missing.length > 0 || !state.canWrite || store.mode === "pending";
+    $("rateNote").textContent = !state.canWrite ? "This link is view only. Ask Sarah for Contributor access to submit."
+      : missing.length ? "Still needed: " + missing.join(", ") + "." : "Ready to send.";
+  }
+  form.addEventListener("change", updateRateButton);
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if ($("rateSubmit").disabled) return;
+    $("rateSubmit").disabled = true; $("rateError").hidden = true;
+    const data = { ts: Date.now(), ordered: $("ordered").value, item: $("item").value, visit: $("visit").value, comment: $("comment").value.trim().slice(0, 500) };
+    CATS.forEach((c) => (data[c.key] = getStars(c.key)));
+    try {
+      await store.add("ratings", data);
+      form.reset(); $("visit").value = visitNow();
+      form.hidden = true; $("thanks").hidden = false; startCountdown();
+    } catch (err) {
+      $("rateError").textContent = err?.code === "invalid_argument"
+        ? "This link can't save feedback. Ask Sarah for Contributor access."
+        : "Couldn't send your feedback. Check the connection and try again.";
+      $("rateError").hidden = false;
+    }
+    updateRateButton();
+  });
+  let timer = null;
+  function startCountdown() {
+    let n = 10; $("countdown").textContent = n;
+    clearInterval(timer);
+    timer = setInterval(() => { n--; $("countdown").textContent = n; if (n <= 0) resetRate(); }, 1000);
+  }
+  function resetRate() { clearInterval(timer); $("thanks").hidden = true; form.hidden = false; updateRateButton(); }
+  $("againBtn").addEventListener("click", resetRate);
+
+  /* ---------- staff check-in ---------- */
+  const fmtTime = (ts) => new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  function tick() { $("clock").textContent = fmtTime(Date.now()); }
+  tick(); setInterval(tick, 15000);
+  let onDuty = 2;
+  try { onDuty = Number(localStorage.getItem("bh-onduty")) || 2; } catch {}
+  $("staffOut").textContent = onDuty;
+  const setDuty = (d) => { onDuty = Math.max(1, Math.min(15, onDuty + d)); $("staffOut").textContent = onDuty; try { localStorage.setItem("bh-onduty", onDuty); } catch {} };
+  $("staffMinus").onclick = () => setDuty(-1); $("staffPlus").onclick = () => setDuty(1);
+
+  $("quick").innerHTML = LEVELS.map((l) => `<button type="button" data-level="${l.v}" style="--c:${l.color}">${l.name}<span>${l.desc}</span></button>`).join("");
+  function updateQuick() {
+    const off = !state.canWrite || store.mode === "pending";
+    document.querySelectorAll("#quick button, #quickItems button, #orderStart").forEach((b) => (b.disabled = off));
+  }
+  let saving = false;
+  $("quick").addEventListener("click", async (e) => {
+    const b = e.target.closest("button[data-level]");
+    if (!b || b.disabled || saving) return;
+    saving = true; $("staffError").hidden = true;
+    const lvl = LEVELS[Number(b.dataset.level) - 1];
+    const data = { ts: Date.now(), level: lvl.v, staff: onDuty, note: $("staffNote").value.trim().slice(0, 140) };
+    try {
+      await store.add("checkins", data);
+      $("staffNote").value = "";
+      toast(`Logged “${lvl.name}” at ${fmtTime(data.ts)}`);
+    } catch {
+      $("staffError").textContent = !state.canWrite || store.mode === "db" ? "Couldn't log the check-in. Check the connection or your access and try again." : "Couldn't log the check-in. Try again.";
+      $("staffError").hidden = false;
+    }
+    saving = false;
+  });
+
+  /* ---------- order timer ---------- */
+  $("orderItem").innerHTML = menuOptions("Any other item…");
+  const QUICK_ITEMS = ["Latte", "Caramel Latte", "Cappuccino", "Americano", "Cold Brew", "Flat White", "Breakfast Sandwich"];
+  $("quickItems").innerHTML = QUICK_ITEMS.map((n) => `<button type="button" class="btn small ghost" data-item="${n}">${n}</button>`).join("");
+  let active = [];
+  try { active = JSON.parse(localStorage.getItem("bh-active") || "[]"); } catch {}
+  const saveActive = () => { try { localStorage.setItem("bh-active", JSON.stringify(active)); } catch {} };
+  function startOrder(item) {
+    if (!item || !state.canWrite) return;
+    active.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), item, start: Date.now() });
+    saveActive(); renderActive();
+  }
+  function renderActive() {
+    $("activeOrders").innerHTML = active.length
+      ? active.map((o) => `<li><span class="o-item">${esc(o.item)}<small>target ${fmtDur(TARGET[o.item])}</small></span><span class="o-time num" data-start="${o.start}" data-target="${TARGET[o.item] || 0}"></span><button type="button" class="btn small" data-done="${o.id}">Ready</button><button type="button" class="o-x" data-cancel="${o.id}" aria-label="Cancel ${esc(o.item)}">×</button></li>`).join("")
+      : `<li class="muted o-empty">No drinks in progress.</li>`;
+    updateElapsed();
+  }
+  function updateElapsed() {
+    document.querySelectorAll(".o-time").forEach((el) => {
+      const secs = (Date.now() - Number(el.dataset.start)) / 1000;
+      el.textContent = fmtDur(secs);
+      el.classList.toggle("over", secs > Number(el.dataset.target));
+    });
+  }
+  setInterval(() => { if (active.length && !$("view-staff").hidden) updateElapsed(); }, 1000);
+  $("orderStart").onclick = () => { startOrder($("orderItem").value); $("orderItem").value = ""; };
+  $("quickItems").addEventListener("click", (e) => { const b = e.target.closest("[data-item]"); if (b) startOrder(b.dataset.item); });
+  $("activeOrders").addEventListener("click", async (e) => {
+    const cancel = e.target.closest("[data-cancel]"), done = e.target.closest("[data-done]");
+    if (cancel) { active = active.filter((o) => o.id !== cancel.dataset.cancel); saveActive(); renderActive(); return; }
+    if (!done) return;
+    const o = active.find((x) => x.id === done.dataset.done);
+    if (!o) return;
+    done.disabled = true; $("orderError").hidden = true;
+    const end = Date.now(), secs = Math.round((end - o.start) / 1000);
+    try {
+      await store.add("orders", { ts: o.start, end, item: o.item, secs });
+      active = active.filter((x) => x.id !== o.id); saveActive(); renderActive();
+      toast(`${o.item} ready in ${fmtDur(secs)}`);
+    } catch {
+      done.disabled = false;
+      $("orderError").textContent = "Couldn't save that order time. Check the connection and tap Ready again.";
+      $("orderError").hidden = false;
+    }
+  });
+
+  function toast(msg) {
+    const t = $("toast"); t.textContent = msg; t.hidden = false;
+    clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2600);
+  }
+
+  /* ---------- helpers ---------- */
+  const hourLabel = (h) => (h % 12 || 12) + (h < 12 ? "a" : "p");
+  const hourLong = (h) => (h % 12 || 12) + (h < 12 || h === 24 ? " AM" : " PM");
+  const avg = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null);
+  const f1 = (n) => (n == null ? "–" : n.toFixed(1));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const miniStars = (v) => { const r = Math.round(v || 0); return "★".repeat(r) + `<span class="off">${"★".repeat(5 - r)}</span>`; };
+  const levelOf = (v) => LEVELS[Math.min(3, Math.max(0, Math.round(v) - 1))];
+  const fmtDur = (s) => { if (s == null || isNaN(s)) return "–"; const t = Math.round(s); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`; };
+  const money = (n) => (n < 0 ? "−" : "") + "$" + Math.abs(Math.round(n)).toLocaleString();
+  const clock = (mins) => { const h = Math.floor(mins / 60), m = mins % 60; return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
+  const startOfToday = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
+
+  /* ---------- today's log (staff tab) ---------- */
+  function renderToday() {
+    const rows = state.checkins.filter((c) => c.ts >= startOfToday()).sort((a, b) => b.ts - a.ts);
+    $("todayCount").textContent = rows.length ? rows.length + " logged" : "";
+    const ot = state.orders.filter((o) => o.ts >= startOfToday());
+    $("ordersToday").textContent = ot.length ? `${ot.length} timed today · avg ${fmtDur(avg(ot.map((o) => o.secs)))}` : "";
+    const ul = $("todayLog");
+    if (!rows.length) { ul.innerHTML = `<li style="grid-template-columns:1fr" class="muted">${state.ready ? "Nothing logged yet today. Tap a button above to start." : "Loading…"}</li>`; return; }
+    ul.innerHTML = rows.slice(0, 30).map((c) => {
+      const l = levelOf(c.level);
+      const detail = [`${c.staff ?? "?"} on duty`, c.note].filter(Boolean).map(esc).join(" · ");
+      return `<li><span class="when">${fmtTime(c.ts)}</span><span class="muted" style="font-size:.88rem;min-width:0">${detail}</span><span class="pill"><i class="swatch" style="background:${l.color}"></i>${l.name}</span></li>`;
+    }).join("");
+  }
+
+  /* ---------- Brew Haven scenario (example data, never saved) ---------- */
+  // [hour, minute, favorite item, visit, coffee, speed, atmosphere, overall, comment] / [hour, minute, level, staff, note]
+  const SCENARIO = {
+    ratings: [
+      [7, 5, "Breakfast Sandwich", "Morning", 4, 5, 5, 5, ""],
+      [7, 40, "Latte", "Morning", 3, 5, 4, 4, ""],
+      [8, 5, "Cold Brew", "Morning", 5, 3, 3, 4, "Great cold brew, but there was nowhere to sit at 8am."],
+      [8, 15, "Caramel Latte", "Morning", 4, 4, 3, 4, ""],
+      [8, 25, "Latte", "Morning", 4, 4, 3, 4, ""],
+      [8, 40, "Caramel Latte", "Morning", 4, 2, 2, 2, "Waited almost 15 minutes for my caramel latte before work, and every table was taken."],
+      [8, 50, "Cappuccino", "Morning", 5, 3, 3, 4, ""],
+      [9, 0, "Caramel Latte", "Morning", 5, 4, 4, 4, "Caramel latte is the best in town!"],
+      [9, 10, "Blueberry Muffin", "Morning", 5, 2, 2, 3, "Line was out the door at 9. Tables were sticky and the bin was overflowing."],
+      [9, 25, "Cold Brew", "Morning", 4, 2, 2, 3, "Too loud and crowded during the morning rush to stay."],
+      [9, 35, "Chai Latte", "Morning", 4, 4, 4, 4, ""],
+      [9, 50, "Cappuccino", "Morning", 5, 3, 3, 4, "Coffee is excellent, but the morning rush feels chaotic."],
+      [9, 55, "Butter Croissant", "Morning", 3, 4, 3, 3, "Croissant was a bit dry."],
+      [10, 40, "Butter Croissant", "Morning", 3, 5, 4, 4, ""],
+      [11, 15, "Latte", "Morning", 4, 5, 4, 4, ""],
+      [11, 50, "Chai Latte", "Morning", 4, 5, 5, 5, "Lovely and calm late morning, great spot to work. More outlets please."],
+      [12, 30, "Caramel Latte", "Afternoon", 5, 4, 4, 4, ""],
+      [13, 20, "Butter Croissant", "Afternoon", 4, 5, 4, 5, ""],
+      [14, 5, "Caramel Latte", "Afternoon", 4, 3, 3, 3, "Afternoon rush was hectic, only two people behind the counter."],
+      [14, 15, "Caramel Latte", "Afternoon", 5, 4, 4, 5, "Would love an iced caramel latte or an oat milk version."],
+      [14, 30, "Cappuccino", "Afternoon", 5, 3, 3, 4, "Seats near the door get cold every time it opens."],
+      [14, 40, "Cold Brew", "Afternoon", 5, 3, 3, 4, ""],
+      [14, 55, "Caramel Latte", "Afternoon", 3, 4, 4, 4, ""],
+      [16, 10, "Latte", "Afternoon", 5, 4, 4, 5, "Do you have a loyalty card? I'm here almost every day."],
+      [17, 30, "Caramel Latte", "Evening", 3, 5, 5, 5, "Quiet and cozy in the evening. Would come more often with an evening deal."]
+    ],
+    checkins: [
+      [6, 30, 1, 2, ""],
+      [7, 0, 2, 2, ""],
+      [7, 30, 2, 2, ""],
+      [8, 0, 3, 3, ""],
+      [8, 30, 4, 3, "Line out the door"],
+      [9, 0, 4, 3, "No free tables"],
+      [9, 30, 3, 3, ""],
+      [10, 0, 2, 3, ""],
+      [10, 30, 2, 2, ""],
+      [11, 0, 2, 2, ""],
+      [11, 30, 2, 2, ""],
+      [12, 0, 2, 2, ""],
+      [12, 30, 2, 2, ""],
+      [13, 0, 2, 2, ""],
+      [13, 30, 2, 2, ""],
+      [14, 0, 3, 2, "School pickup crowd"],
+      [14, 30, 4, 2, "Only 2 on, line of 12"],
+      [15, 0, 2, 2, ""],
+      [15, 30, 2, 2, ""],
+      [16, 0, 1, 2, ""],
+      [16, 30, 2, 2, ""],
+      [17, 0, 1, 2, ""],
+      [17, 30, 1, 2, ""],
+      [18, 0, 1, 2, ""],
+      [18, 30, 1, 2, ""]
+    ],
+  };
+  function sampleData() {
+    const at = (h, m) => { const d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); };
+    return {
+      ratings: SCENARIO.ratings.map(([h, m, item, visit, coffee, speed, atmosphere, overall, comment]) => ({ ts: at(h, m), item, visit, coffee, speed, atmosphere, overall, comment })),
+      checkins: SCENARIO.checkins.map(([h, m, level, staff, note]) => ({ ts: at(h, m), level, staff, note })),
+      orders: scenarioOrders(at),
+    };
+  }
+  // Timed orders for the scenario day: volume follows the logged pace; make times stretch as it gets busier.
+  function scenarioOrders(at) {
+    const MIX = [["Caramel Latte", 9], ["Latte", 6], ["Cappuccino", 4], ["Americano", 4], ["Cold Brew", 3], ["Flat White", 3], ["Chai Latte", 2], ["Espresso", 2], ["Mocha", 1], ["Pour-over", 1], ["Butter Croissant", 3], ["Breakfast Sandwich", 2], ["Blueberry Muffin", 2]];
+    const total = MIX.reduce((a, [, w]) => a + w, 0);
+    let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const pick = () => { let r = rnd() * total; for (const [n, w] of MIX) if ((r -= w) < 0) return n; return MIX[0][0]; };
+    const out = [];
+    SCENARIO.checkins.forEach(([h, m, level]) => {
+      const n = level * 3 + Math.floor(rnd() * 3);
+      for (let i = 0; i < n; i++) {
+        const item = pick(), start = at(h, m) + Math.floor(rnd() * 30 * 60e3);
+        let secs = TARGET[item] * (0.86 + (level - 1) * 0.07 + rnd() * 0.12);
+        if (item === "Caramel Latte") secs += 50 + level * 15;        // sauce + drizzle step
+        if (item === "Breakfast Sandwich" && level >= 3) secs += 70;  // one oven, queued in a rush
+        secs = Math.round(secs);
+        out.push({ ts: start, end: start + secs * 1000, item, secs });
+      }
+    });
+    return out;
+  }
+
+  function sourceData() { return state.sample ? (sampleData.cache ||= sampleData()) : state; }
+  function sinceTs() { return state.range === "today" ? startOfToday() : state.range ? Date.now() - Number(state.range) * 864e5 : 0; }
+
+  /* ---------- dashboard ---------- */
+  function renderDash() {
+    if ($("view-dash").hidden) return;
+    const hasReal = state.ratings.length || state.checkins.length;
+    $("sampleBanner").hidden = !state.sample;
+    $("scenarioBtn").hidden = !hasReal && !state.sample;
+    $("scenarioBtn").textContent = state.sample ? "Show real data" : "Show scenario data";
+    const empty = !hasReal && !state.sample;
+    $("dashEmpty").hidden = !empty;
+    $("dashBody").hidden = empty;
+    if (empty) return;
+
+    const src = sourceData(), since = sinceTs();
+    const ratings = src.ratings.filter((r) => r.ts >= since);
+    const checkins = src.checkins.filter((c) => c.ts >= since);
+    const isToday = state.range === "today";
+    const rangeWord = { today: "today", 7: "the last 7 days", 30: "the last 30 days", 0: "all time" }[state.range];
+    $("dashTitle").textContent = isToday ? "Today at Brew Haven" : "Brew Haven, " + rangeWord;
+    $("sumTitle").textContent = isToday ? "Today's feedback" : "Feedback, " + rangeWord;
+
+    // 1. feedback summary
+    const catAvg = {}; CATS.forEach((c) => (catAvg[c.key] = avg(ratings.map((r) => r[c.key]).filter(Boolean))));
+    const scored = CATS.filter((c) => catAvg[c.key] != null);
+    const lowest = scored.filter((c) => c.key !== "overall").sort((a, b) => catAvg[a.key] - catAvg[b.key])[0];
+    $("overallNum").textContent = f1(catAvg.overall);
+    $("overallStars").innerHTML = catAvg.overall ? miniStars(catAvg.overall) : "";
+    $("ratingCount").textContent = ratings.length + (ratings.length === 1 ? " response" : " responses");
+    $("cats").innerHTML = CATS.map((c) => `<div class="cat${lowest && c.key === lowest.key && catAvg[c.key] < 4 ? " low" : ""}"><span>${c.label}</span><span class="meter"><i style="width:${((catAvg[c.key] || 0) / 5) * 100}%"></i></span><span class="num" style="text-align:right">${f1(catAvg[c.key])}</span></div>`).join("");
+    const visitCounts = VISITS.map((v) => ({ v, n: ratings.filter((r) => r.visit === v).length }));
+    $("visitSplit").innerHTML = ratings.length ? visitCounts.map((x) => `<span class="pill">${x.v} <span class="num">${x.n}</span></span>`).join("") : "";
+
+    // 3. quick insights
+    const itemCounts = {};
+    ratings.forEach((r) => { if (r.item) (itemCounts[r.item] ||= []).push(r.overall); });
+    const popular = Object.entries(itemCounts).map(([name, v]) => ({ name, n: v.length, v: avg(v) })).sort((a, b) => b.n - a.n || b.v - a.v);
+    $("popList").innerHTML = popular.length ? popular.slice(0, 3).map((p) => `<li><strong>${esc(p.name)}</strong> <span class="muted">· ${p.n} ${p.n === 1 ? "vote" : "votes"}</span></li>`).join("")
+      : `<li class="muted" style="list-style:none;margin-left:-1.2em">No favorites picked yet.</li>`;
+
+    const fixes = [];
+    const ranked = scored.filter((c) => c.key !== "overall").sort((a, b) => catAvg[a.key] - catAvg[b.key]);
+    ranked.slice(0, 2).forEach((c, i) => {
+      const v = catAvg[c.key];
+      if (i === 0 || v < 4) fixes.push(`<strong>${c.label}</strong> at <span class="num">${f1(v)}</span>${i === 0 ? " is the lowest-rated area" : ""}${c.key === "speed" ? ". Check whether it drops at peak hours." : "."}`);
+    });
+    const busyHours = new Set(peakHours(checkins).slice(0, 3).map((d) => d.h));
+    const inPeak = ratings.filter((r) => busyHours.has(new Date(r.ts).getHours())).map((r) => r.speed);
+    const offPeak = ratings.filter((r) => !busyHours.has(new Date(r.ts).getHours())).map((r) => r.speed);
+    if (inPeak.length >= 3 && offPeak.length >= 3 && avg(offPeak) - avg(inPeak) >= 0.4)
+      fixes.push(`Service speed falls to <span class="num">${f1(avg(inPeak))}</span> during peak hours, vs <span class="num">${f1(avg(offPeak))}</span> otherwise.`);
+    const lowVisit = VISITS.map((v) => ({ v, s: avg(ratings.filter((r) => r.visit === v).map((r) => r.overall)), n: ratings.filter((r) => r.visit === v).length })).filter((x) => x.n >= 3).sort((a, b) => a.s - b.s)[0];
+    if (lowVisit && lowVisit.s < 3.8) fixes.push(`${lowVisit.v} visits rate lowest overall (<span class="num">${f1(lowVisit.s)}</span>).`);
+    $("fixList").innerHTML = fixes.length ? fixes.map((f) => `<li>${f}</li>`).join("") : `<li class="muted" style="list-style:none;margin-left:-1.2em">No ratings in this range yet.</li>`;
+
+    const staffNotes = [];
+    const peaks = peakHours(checkins);
+    if (peaks.length) {
+      const top = peaks[0];
+      staffNotes.push(`Busiest ${peakWindows(checkins).length > 1 ? "periods are" : "period is"} <strong>${windowsText(peakWindows(checkins))}</strong>. Put your strongest crew on then.`);
+      const understaffed = checkins.filter((c) => c.level >= 3 && c.staff != null && c.staff <= 2).length;
+      if (understaffed) staffNotes.push(`${understaffed} busy or rush check-in${understaffed > 1 ? "s" : ""} had 2 or fewer staff on duty.`);
+      const quiet = peaks[peaks.length - 1];
+      if (peaks.length >= 4 && quiet.v < 2) staffNotes.push(`${hourLong(quiet.h)} is usually slow. Use it for restocking, prep and breaks.`);
+    }
+    $("staffList").innerHTML = staffNotes.map((s) => `<li>${s}</li>`).join("");
+    $("staffInsightBox").hidden = !staffNotes.length;
+
+    // 2. traffic: today's busy periods (always today, whatever the range)
+    const today = src.checkins.filter((c) => c.ts >= startOfToday()).sort((a, b) => a.ts - b.ts);
+    $("todayCheckins").textContent = today.length + (today.length === 1 ? " check-in" : " check-ins");
+    const segs = today.map((c, i) => ({ ...c, end: Math.min(today[i + 1]?.ts ?? Infinity, c.ts + (state.sample ? 30 : 60) * 60e3, state.sample ? Infinity : Math.max(Date.now(), c.ts + 5 * 60e3)) }));
+    $("todayStrip").innerHTML = today.length ? todayStrip(segs) : `<p class="muted">No check-ins logged today yet. Staff can log one from the Staff tab.</p>`;
+    const periods = [];
+    segs.forEach((s) => {
+      if (s.level < 3) return;
+      const last = periods[periods.length - 1];
+      if (last && s.ts - last.end < 5 * 60e3) { last.end = s.end; last.max = Math.max(last.max, s.level); }
+      else periods.push({ start: s.ts, end: s.end, max: s.level });
+    });
+    $("periods").innerHTML = today.length ? (periods.length ? periods.map((p) => `<li><span class="num">${fmtTime(p.start)} – ${fmtTime(p.end)}</span><span class="pill"><i class="swatch" style="background:${LEVELS[p.max - 1].color}"></i>${LEVELS[p.max - 1].name}</span></li>`).join("")
+      : `<li class="muted">No busy or rush periods logged today.</li>`) : "";
+
+    // 2. traffic: peak hours over the chosen range
+    const hourAvg = [];
+    for (let h = OPEN; h < CLOSE; h++) { const v = checkins.filter((c) => new Date(c.ts).getHours() === h).map((c) => c.level); hourAvg.push({ label: hourLabel(h), h, v: avg(v), n: v.length }); }
+    $("checkinCount").textContent = checkins.length + (checkins.length === 1 ? " check-in" : " check-ins");
+    $("hourChart").innerHTML = barChart(hourAvg);
+    $("legend").innerHTML = LEVELS.map((l) => `<span><i class="swatch" style="background:${l.color}"></i>${l.v} · ${l.name}</span>`).join("");
+    if (peaks.length) {
+      $("peakCallout").innerHTML = `Peak: <strong>${windowsText(peakWindows(checkins))}</strong> <span class="muted">(${rangeWord})</span>`;
+    } else $("peakCallout").innerHTML = `<span class="muted">Not enough check-ins in this range to find a peak.</span>`;
+
+    // prep times
+    const ps = prepStats((src.orders || []).filter((o) => o.ts >= since), peakWindows(checkins));
+    $("orderCount").textContent = ps.n + (ps.n === 1 ? " timed order" : " timed orders");
+    if (!ps.n) {
+      $("prepCallout").innerHTML = `<span class="muted">No orders timed in this range. Baristas can time drinks with the Order timer on the Staff tab.</span>`;
+      $("prepRows").innerHTML = "";
+    } else {
+      const behind = ps.rows.filter((r) => r.ratio > 1.3 && r.n >= 3);
+      const gap = ps.peakAll && ps.offAll ? Math.round((ps.peakAll / ps.offAll - 1) * 100) : null;
+      $("prepCallout").innerHTML = (behind.length
+        ? `Falling behind: ` + behind.slice(0, 3).map((r) => `<strong>${esc(r.item)}</strong> <span class="num">${fmtDur(r.avg)}</span> <span class="muted">vs ${fmtDur(r.target)}</span>`).join(", ")
+        : `Every item is within 30% of its target time.`) + (gap > 5 ? `<br><span class="muted" style="font-size:.9rem">At peak, items take ${gap}% longer than off-peak.</span>` : "");
+      $("prepRows").innerHTML = ps.rows.map((r) => { const [lbl, cls] = prepStatus(r.ratio); return `<tr><td>${esc(r.item)}</td><td class="r num">${r.n}</td><td class="r num">${fmtDur(r.avg)}</td><td class="r num">${fmtDur(r.target)}</td><td class="r num">${fmtDur(r.peak)}</td><td><span class="pill ${cls}">${lbl}</span></td></tr>`; }).join("");
+    }
+
+    // 1. recent comments
+    const cm = ratings.filter((r) => r.comment).sort((a, b) => b.ts - a.ts).slice(0, 6);
+    $("quotes").innerHTML = cm.length ? cm.map((r) => `<li><q>${esc(r.comment)}</q><small>${esc(r.item || "")} · ${esc(r.visit || "")} · ${new Date(r.ts).toLocaleDateString([], { month: "short", day: "numeric" })}, ${fmtTime(r.ts)}</small></li>`).join("")
+      : `<li class="muted" style="border:0;padding:0">No comments in this range.</li>`;
+  }
+
+  function peakHours(checkins) {
+    const by = {};
+    checkins.forEach((c) => { const h = new Date(c.ts).getHours(); (by[h] ||= []).push(c.level); });
+    return Object.entries(by).map(([h, v]) => ({ h: +h, v: avg(v), n: v.length })).sort((a, b) => b.v - a.v || b.n - a.n);
+  }
+
+  // consecutive hours averaging "Very busy" (3) or more; falls back to the single busiest hour
+  function mergeHours(hours) {
+    const out = [];
+    [...hours].sort((a, b) => a - b).forEach((h) => { const last = out[out.length - 1]; if (last && last.to === h) last.to = h + 1; else out.push({ from: h, to: h + 1 }); });
+    return out;
+  }
+  function peakWindows(checkins) {
+    const ph = peakHours(checkins);
+    if (!ph.length) return [];
+    const hot = ph.filter((d) => d.v >= 3).map((d) => d.h);
+    return hot.length ? mergeHours(hot) : [{ from: ph[0].h, to: ph[0].h + 1 }];
+  }
+  function prepStats(orders, ws) {
+    const valid = orders.filter((o) => o.secs > 5 && o.secs <= 1800 && TARGET[o.item]); // ignore timers left running
+    const by = {};
+    valid.forEach((o) => (by[o.item] ||= []).push(o));
+    const rows = Object.entries(by).map(([item, os]) => {
+      const a = avg(os.map((o) => o.secs));
+      return { item, n: os.length, avg: a, target: TARGET[item], ratio: a / TARGET[item], peak: avg(os.filter((o) => inWindows(o.ts, ws)).map((o) => o.secs)) };
+    }).sort((a, b) => b.ratio - a.ratio);
+    const rel = (list) => avg(list.map((o) => o.secs / TARGET[o.item]));
+    return { rows, n: valid.length, peakAll: rel(valid.filter((o) => inWindows(o.ts, ws))), offAll: rel(valid.filter((o) => !inWindows(o.ts, ws))) };
+  }
+  const prepStatus = (r) => (r <= 1.1 ? ["On pace", "good"] : r <= 1.3 ? ["Slow", "warn"] : ["Behind", "bad"]);
+  const windowsText = (ws) => ws.map((w) => `${hourLong(w.from).replace(" AM", w.to <= 12 ? "" : " AM").replace(" PM", w.from >= 12 ? "" : " PM")}–${hourLong(w.to)}`).join(" and ");
+  const inWindows = (ts, ws) => { const h = new Date(ts).getHours(); return ws.some((w) => h >= w.from && h < w.to); };
+
+  function todayStrip(segs) {
+    const W = 640, H = 64, padL = 8, padR = 8, barY = 8, barH = 28;
+    const d0 = new Date(); d0.setHours(OPEN, 0, 0, 0);
+    const t0 = d0.getTime(), t1 = t0 + (CLOSE - OPEN) * 36e5;
+    const x = (t) => padL + ((Math.min(Math.max(t, t0), t1) - t0) / (t1 - t0)) * (W - padL - padR);
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Today's logged pace from ${hourLong(OPEN)} to ${hourLong(CLOSE)}">`;
+    s += `<rect x="${padL}" y="${barY}" width="${W - padL - padR}" height="${barH}" rx="6" fill="var(--sunk)"/>`;
+    segs.forEach((g) => { const a = x(g.ts), b = x(g.end); if (b > a) s += `<rect x="${a}" y="${barY}" width="${Math.max(2, b - a)}" height="${barH}" fill="${levelOf(g.level).color}"><title>${fmtTime(g.ts)}: ${levelOf(g.level).name}</title></rect>`; });
+    for (let h = OPEN; h <= CLOSE; h += 2) {
+      const d = new Date(); d.setHours(h, 0, 0, 0); const xx = x(d.getTime());
+      s += `<line x1="${xx}" x2="${xx}" y1="${barY + barH}" y2="${barY + barH + 5}" stroke="var(--muted)"/>`;
+      s += `<text x="${xx}" y="${H - 6}" text-anchor="${h === OPEN ? "start" : h === CLOSE ? "end" : "middle"}" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${hourLabel(h)}</text>`;
+    }
+    const now = Date.now(); if (now > t0 && now < t1) s += `<line x1="${x(now)}" x2="${x(now)}" y1="${barY - 4}" y2="${barY + barH + 4}" stroke="var(--ink)" stroke-width="2"/>`;
+    return s + "</svg>";
+  }
+
+  function barChart(data) {
+    const max = 4, W = 640, H = 200, padL = 28, padB = 26, padT = 18;
+    const bw = (W - padL) / data.length;
+    const y = (v) => H - padB - (v / max) * (H - padB - padT);
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Average pace by hour">`;
+    for (let g = 1; g <= max; g++) {
+      s += `<line x1="${padL}" x2="${W}" y1="${y(g)}" y2="${y(g)}" stroke="var(--line)" stroke-dasharray="${g === max ? "0" : "3 4"}"/>`;
+      s += `<text x="${padL - 8}" y="${y(g) + 4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${g}</text>`;
+    }
+    s += `<line x1="${padL}" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--muted)"/>`;
+    const peak = Math.max(...data.map((d) => d.v || 0));
+    data.forEach((d, i) => {
+      const x = padL + i * bw + bw * 0.18, w = bw * 0.64;
+      if (d.v != null) {
+        const top = y(d.v);
+        s += `<rect x="${x}" y="${top}" width="${w}" height="${y(0) - top}" rx="4" fill="${levelOf(d.v).color}"><title>${d.label}: ${f1(d.v)} average from ${d.n} check-ins</title></rect>`;
+        if (d.v === peak) s += `<text x="${x + w / 2}" y="${top - 5}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)" font-family="var(--f-mono)">${f1(d.v)}</text>`;
+      } else s += `<rect x="${x}" y="${y(0) - 2}" width="${w}" height="2" fill="var(--line)"/>`;
+      s += `<text x="${x + w / 2}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${d.label}</text>`;
+    });
+    return s + "</svg>";
+  }
+
+  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+    state.range = b.dataset.range === "today" ? "today" : Number(b.dataset.range);
+    document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    renderDash();
+  }));
+  /* ---------- ideas: suggestions built from the survey, check-ins and order times ---------- */
+  const RANGE_WORD = { today: "today", 7: "the last 7 days", 30: "the last 30 days", 0: "all time" };
+  const TAGS = { quick: "Quick win", month: "This month", big: "Bigger project" };
+  const KW = {
+    seat: /seat|table|sit|crowd|packed/, noise: /loud|music|noise|chaotic|hectic/, clean: /sticky|bin|clean|dirty|messy/,
+    outlet: /outlet|plug|laptop/, draft: /cold every|door|draft/, loyalty: /loyalty|card|reward|points|stamp/,
+    stale: /dry|stale/, iced: /iced|oat/, evening: /evening/,
+  };
+  const PREP_FIX = {
+    "Caramel Latte": ["Switch the caramel to pre-filled squeeze bottles and pumps instead of spooning sauce.", "Pre-drizzle a sleeve of cups before each rush.", "Keep one steaming pitcher just for caramel drinks."],
+    "Breakfast Sandwich": ["Pre-assemble sandwiches before 7:30 AM so they only need heating.", "Add a second press or oven slot for the morning rush."],
+    "Pour-over": ["Offer pour-over outside peak hours only, or batch-brew a daily single origin."],
+  };
+  const shiftText = (w) => `${clock(w.from * 60 - 15)}–${clock(w.to * 60 + 15)}`;
+  const idea = (i) => `<div class="idea"><div class="idea-top"><h4>${i.title}</h4><span class="tag ${i.tag}">${TAGS[i.tag]}</span></div>${i.why ? `<p class="why">${i.why}</p>` : ""}<ul>${i.steps.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
+
+  function renderIdeas() {
+    if ($("view-ideas").hidden) return;
+    $("ideasBanner").hidden = !state.sample;
+    const src = sourceData(), since = sinceTs();
+    const ratings = src.ratings.filter((r) => r.ts >= since);
+    const checkins = src.checkins.filter((c) => c.ts >= since);
+    const orders = (src.orders || []).filter((o) => o.ts >= since);
+    const empty = ratings.length < 3;
+    $("ideasEmpty").hidden = !empty; $("ideasBody").hidden = empty; $("roiCard").hidden = empty;
+    if (empty) return;
+    $("ideasBasis").textContent = `Based on ${ratings.length} guest responses, ${checkins.length} staff check-ins and ${orders.length} timed orders from ${RANGE_WORD[state.range]}. Suggestions update as new feedback arrives.`;
+
+    const cat = {}; CATS.forEach((c) => (cat[c.key] = avg(ratings.map((r) => r[c.key]).filter(Boolean))));
+    const ws = peakWindows(checkins), wtxt = ws.length ? windowsText(ws) : null;
+    const texts = ratings.map((r) => (r.comment || "").toLowerCase()).filter(Boolean);
+    const hits = Object.fromEntries(Object.entries(KW).map(([k, re]) => [k, texts.filter((t) => re.test(t)).length]));
+    const quote = (re) => { const r = ratings.find((x) => x.comment && re.test(x.comment.toLowerCase())); return r ? `“${esc(r.comment)}”` : ""; };
+    const atPeak = (k) => avg(ratings.filter((r) => inWindows(r.ts, ws)).map((r) => r[k]));
+    const offPeak = (k) => avg(ratings.filter((r) => !inWindows(r.ts, ws)).map((r) => r[k]));
+    const low = CATS.filter((c) => c.key !== "overall" && cat[c.key] != null).sort((a, b) => cat[a.key] - cat[b.key])[0];
+    const ps = prepStats(orders, ws);
+    const behind = ps.rows.filter((r) => r.ratio > 1.3 && r.n >= 3);
+    const favs = {}; ratings.forEach((r) => { if (r.item) favs[r.item] = (favs[r.item] || 0) + 1; });
+    const topFav = Object.entries(favs).sort((a, b) => b[1] - a[1])[0];
+    const quiet = peakHours(checkins).filter((h) => h.v <= 1.5 && h.n >= 1).map((h) => h.h);
+    const quietTxt = quiet.length ? windowsText(mergeHours(quiet)) : null;
+    const understaffed = checkins.filter((c) => c.level >= 3 && c.staff != null && c.staff <= 2);
+
+    // Do this first
+    let plan;
+    if (low?.key === "atmosphere") {
+      const lowAt = ratings.filter((r) => r.atmosphere <= 3), lowAtPeak = lowAt.filter((r) => inWindows(r.ts, ws));
+      plan = {
+        title: `Put a floor host on during ${wtxt || "the busiest hours"}, starting tomorrow`,
+        why: `Atmosphere is the lowest score at ${f1(cat.atmosphere)}/5.` +
+          (ws.length ? ` ${lowAtPeak.length} of ${lowAt.length} low atmosphere ratings came during the rushes (${f1(atPeak("atmosphere"))} at peak vs ${f1(offPeak("atmosphere"))} the rest of the day).` : "") +
+          ` Service speed also drops at peak. ${quote(KW.clean) || quote(KW.seat)}`,
+        steps: [
+          `Schedule one extra person ${ws.length ? ws.map(shiftText).join(" and ") : "for each rush"}. Their job is the floor and handoff: clear and wipe tables, empty bins, restock the condiment bar, call out finished drinks.`,
+          "Run a 5-minute reset every 30 minutes during rushes: tables, bins, napkins, floor, music volume.",
+          "Set up a pickup shelf by the door so takeaway guests don't crowd the seating.",
+          "Check the atmosphere and service scores again in a week.",
+        ],
+      };
+    } else if (low?.key === "speed") {
+      plan = { title: `Add a second person on bar during ${wtxt || "the rush"}`, why: `Service speed is the lowest score at ${f1(cat.speed)}/5${ws.length ? `, falling to ${f1(atPeak("speed"))} at peak` : ""}.`,
+        steps: ["Schedule an extra barista for each peak window, starting 15 minutes early.", "Pre-batch sauces and cold brew before the rush.", "Take orders down the line on a tablet during rushes."] };
+    } else {
+      plan = { title: "Run a taste check on every espresso drink this week", why: `Coffee quality is the lowest score at ${f1(cat.coffee)}/5.`,
+        steps: ["Dial in the grinder at open and again before the afternoon.", "Check milk temperature and freshness.", "Have the lead barista taste one of each drink every shift."] };
+    }
+
+    const staffing = [];
+    if (ws.length) staffing.push({ tag: "quick", title: `Schedule around the peaks: ${wtxt}`,
+      why: `Staff logged “Very busy” or “Rush period” most in these hours.` +
+        (atPeak("speed") != null && offPeak("speed") != null ? ` Service speed drops to <b>${f1(atPeak("speed"))}</b> during them, vs <b>${f1(offPeak("speed"))}</b> otherwise.` : "") +
+        (understaffed.length ? ` ${understaffed.length} busy check-in${understaffed.length > 1 ? "s" : ""} had only 2 people on duty.` : ""),
+      steps: [...ws.map((w) => `Add one person ${shiftText(w)}, arriving 15 minutes before the rush so the bar is stocked when it hits.`),
+        "Stagger breaks so nobody is off the floor during a peak.", "Put your fastest barista on bar and a second person on register and handoff."] });
+    if (quietTxt) staffing.push({ tag: "month", title: `Trim or repurpose ${quietTxt}`, why: `These hours average “Slow period” in the check-ins.`,
+      steps: ["Run one fewer person, or use the time for prep, deep cleaning and training.", "Bake the second pastry batch and restock milk before the afternoon peak.", "Move the hours you save into the peak windows above."] });
+
+    const prep = [];
+    if (ps.n) {
+      behind.slice(0, 2).forEach((r) => prep.push({ tag: "quick", title: `Speed up the ${esc(r.item)}`,
+        why: `Takes <b>${fmtDur(r.avg)}</b> on average vs a <b>${fmtDur(r.target)}</b> target across ${r.n} timed orders${r.peak ? `, and ${fmtDur(r.peak)} at peak` : ""}.`,
+        steps: PREP_FIX[r.item] || ["Watch three of these being made at peak and note where the wait is.", "Pre-portion its ingredients before the rush.", "Keep everything it needs within one step of the machine."] }));
+      if (ps.peakAll && ps.offAll && ps.peakAll > ps.offAll * 1.1) prep.push({ tag: "month", title: "Build a pre-rush prep routine",
+        why: `Across all items, make times run <b>${Math.round((ps.peakAll / ps.offAll - 1) * 100)}%</b> longer at peak than off-peak.`,
+        steps: ["Before each peak: fill milk pitchers, restock cups and lids, pre-batch cold brew, refill sauce bottles.", "Keep timing orders for two weeks to see whether it helps."] });
+    } else prep.push({ tag: "quick", title: "Start timing orders", why: "No prep times logged yet, so there's no way to see which drinks slow the line.",
+      steps: ["Ask baristas to use the Order timer on the Staff tab through one morning rush.", "Check the Drink prep times card on the dashboard afterwards."] });
+
+    const menu = [];
+    if (topFav) {
+      const [name, n] = topFav, mo = new Date().getMonth();
+      const seasonal = mo >= 8 && mo <= 10 ? "Maple Caramel Latte" : mo === 11 || mo <= 1 ? "Salted Caramel Mocha" : mo <= 4 ? "Honey Caramel Oat Latte" : "Caramel Cold Foam Cold Brew";
+      menu.push({ tag: "month", title: `Build on the ${esc(name)}`, why: `Your most popular item: <b>${n} of ${ratings.length}</b> guests picked it as their favorite. ${hits.iced ? quote(KW.iced) : ""}`,
+        steps: /Caramel/.test(name)
+          ? ["Add an Iced Caramel Latte and an oat-milk option.", `Run a ${seasonal} as a limited seasonal special.`, "Pair it with a croissant as a morning combo. Combos are faster to order.", "Fix its prep time first (see Speed & prep) so extra demand doesn't slow the line."]
+          : ["Feature it at the top of the menu board.", "Add an iced or seasonal version.", "Pair it with a pastry as a combo."] });
+    }
+    if (hits.stale) menu.push({ tag: "quick", title: "Keep pastries fresh all day", why: `Guests mention dry or stale pastries. ${quote(KW.stale)}`,
+      steps: ["Bake in two smaller batches: before opening and around 1 PM, ahead of the afternoon peak.", "Mark down what's left after 4 PM instead of throwing it out.", "Write down what gets thrown out each day and adjust the bake to match."] });
+    menu.push({ tag: "month", title: "Add a short rush menu", why: ws.length ? `Most orders land in ${wtxt}.` : "Keeps the line moving when it's busiest.",
+      steps: ["Highlight 5–6 fast drinks on the board during peaks: drip, Americano, cold brew, latte.", "Save slow items like pour-over for quieter hours."] });
+
+    const atmo = [];
+    if (hits.seat) atmo.push({ tag: "month", title: "Make more room at peak", why: `${hits.seat} comment${hits.seat > 1 ? "s" : ""} mention tables, seating or crowding. ${quote(KW.seat)}`,
+      steps: ["Swap a four-top for two two-tops, and add a window bar with stools.", "Add a grab-and-go pickup shelf by the door.", "Put small “please share tables during the rush” signs out during peak hours."] });
+    if (hits.clean) atmo.push({ tag: "quick", title: "Keep tables and bins clean during rushes", why: quote(KW.clean),
+      steps: ["Post a laminated 30-minute checklist at the bar: tables, bins, condiment bar, floor.", "One person owns the checklist each rush and initials it."] });
+    if (hits.noise) atmo.push({ tag: "quick", title: "Bring the noise down", why: quote(KW.noise),
+      steps: ["Set a music volume limit and a calmer playlist for peak hours.", "Call names at a normal volume and use a pickup board."] });
+    if (hits.outlet) atmo.push({ tag: "month", title: "Create a laptop corner", why: quote(KW.outlet),
+      steps: ["Add a power-strip bar along one wall.", "Keep the tables nearest the counter laptop-free during peaks."] });
+    if (hits.draft) atmo.push({ tag: "big", title: "Fix the draft by the door", why: quote(KW.draft),
+      steps: ["Add a door curtain or draft stopper.", "Move the coziest seats away from the entrance."] });
+    if (!atmo.length && cat.atmosphere != null && cat.atmosphere < 4) atmo.push({ tag: "quick", title: "Find out what's off about the space", why: `Atmosphere averages ${f1(cat.atmosphere)}/5 but guests haven't said why.`,
+      steps: ["Ask one guest per hour what they'd change about the space.", "Check lighting, temperature, music volume and cleanliness at each peak."] });
+
+    const eveningN = ratings.filter((r) => r.visit === "Evening").length;
+    const rewards = [];
+    rewards.push({ tag: "month", title: "Launch a loyalty card: 10th drink free", why: hits.loyalty ? `Guests are asking for one. ${quote(KW.loyalty)}` : "Regulars are the base of a neighborhood coffee shop.",
+      steps: ["Start with a stamp card or your POS's loyalty add-on.", topFav ? `Give a bonus stamp on the ${esc(topFav[0])}. Guests already love it.` : "Give a bonus stamp on your signature drink.", "Track redemptions each month."] });
+    if (ws.length) rewards.push({ tag: "month", title: `Double points ${quietTxt ? "during " + quietTxt : "outside the rush"}`,
+      why: `Traffic piles up in ${wtxt}. Rewarding off-peak visits spreads it out, which helps service speed and seating at once.`,
+      steps: [`Double stamps ${quietTxt ? "from " + quietTxt : "in quiet hours"}.`, "Promote it on cup sleeves and the counter sign."] });
+    if (hits.evening || eveningN <= ratings.length * 0.1) rewards.push({ tag: "month", title: "Try an evening happy hour",
+      why: `Only ${eveningN} of ${ratings.length} responses came from evening visits. ${quote(KW.evening)}`,
+      steps: ["20% off drinks after 5 PM, or a free pastry with any drink.", "Run it for four weeks and compare evening check-ins."] });
+    rewards.push({ tag: "quick", title: "Reward guests for giving feedback", why: `${ratings.length} responses so far. More responses give Sarah firmer numbers.`,
+      steps: ["Give a free stamp or pastry upgrade for completing the survey.", "Put a QR code for this form on tables and receipts."] });
+    rewards.push({ tag: "big", title: "Order-ahead with points", why: ws.length ? `Takes regulars out of the ${wtxt} line entirely.` : "Cuts time at the counter.",
+      steps: ["Turn on your POS provider's order-ahead feature.", "Link it to the loyalty card so mobile orders earn points too."] });
+
+    const groups = [["Staffing", staffing], ["Speed &amp; prep", prep], ["Menu", menu], ["Atmosphere", atmo], ["Rewards &amp; loyalty", rewards]];
+    $("ideasBody").innerHTML =
+      `<div class="card plan"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><p class="eyebrow">Do this first</p><span class="tag quick">Quick win</span></div><h3>${plan.title}</h3><p class="why">${plan.why}</p><ol>${plan.steps.map((x) => `<li>${x}</li>`).join("")}</ol></div>` +
+      groups.filter(([, g]) => g.length).map(([name, g]) => `<div class="card idea-group"><h3>${name}</h3>${g.map(idea).join("")}</div>`).join("");
+
+    const peakShare = orders.length
+      ? orders.filter((o) => inWindows(o.ts, ws)).length / orders.length
+      : checkins.length ? checkins.filter((c) => inWindows(c.ts, ws)).reduce((a, c) => a + c.level, 0) / checkins.reduce((a, c) => a + c.level, 0) : 0.35;
+    roiCtx = { peakHrs: ws.reduce((a, w) => a + (w.to - w.from), 0), quietHrs: quiet.length, peakShare, wtxt, quietTxt };
+    renderRoi();
+  }
+
+  /* ---------- ROI estimate ---------- */
+  const ROI_FIELDS = [
+    ["ticket", "Average ticket", "$", 6.5, 0.25],
+    ["customers", "Customers per day", "", 250, 10],
+    ["wage", "Staff cost per hour", "$", 18, 1],
+    ["days", "Days open per month", "", 30, 1],
+    ["margin", "Gross margin per sale", "%", 65, 5],
+    ["walk", "Fewer peak walkaways", "%", 5, 1],
+    ["waste", "Food & milk waste per day", "$", 40, 5],
+    ["wasteCut", "Waste cut by prepping to demand", "%", 25, 5],
+    ["setup", "One-time setup cost", "$", 300, 50],
+  ];
+  let roiVals = Object.fromEntries(ROI_FIELDS.map(([k, , , d]) => [k, d]));
+  try { Object.assign(roiVals, JSON.parse(localStorage.getItem("bh-roi") || "{}")); } catch {}
+  let roiCtx = null;
+  $("roiInputs").innerHTML = ROI_FIELDS.map(([k, label, unit, , step]) =>
+    `<label for="roi-${k}">${label}<span class="inp">${unit === "$" ? "$" : ""}<input type="number" inputmode="decimal" min="0" step="${step}" id="roi-${k}" value="${roiVals[k]}">${unit === "%" ? "%" : ""}</span></label>`).join("");
+  $("roiInputs").addEventListener("input", (e) => {
+    const k = e.target.id?.replace("roi-", "");
+    if (!(k in roiVals)) return;
+    const v = parseFloat(e.target.value);
+    roiVals[k] = isNaN(v) ? 0 : v;
+    try { localStorage.setItem("bh-roi", JSON.stringify(roiVals)); } catch {}
+    renderRoi();
+  });
+
+  function renderRoi() {
+    if (!roiCtx) return;
+    const v = roiVals, c = roiCtx;
+    const saved = c.quietHrs * v.wage * v.days;
+    const added = c.peakHrs * v.wage * v.days;
+    const peakCust = v.customers * c.peakShare;
+    const recovered = peakCust * (v.walk / 100) * v.ticket * v.days * (v.margin / 100);
+    const waste = v.waste * (v.wasteCut / 100) * v.days;
+    const monthly = saved - added + recovered + waste;
+    const invest = added * 12 + v.setup, ret = (saved + recovered + waste) * 12;
+    const rows = [
+      ["Staff hours cut from slow periods", `${c.quietHrs} h/day${c.quietTxt ? ` (${c.quietTxt})` : ""} × $${v.wage}/h × ${v.days} days`, saved],
+      ["Extra person during peaks", `${c.peakHrs} h/day${c.wtxt ? ` (${c.wtxt})` : ""} × $${v.wage}/h × ${v.days} days`, -added],
+      ["Profit from sales kept at peak", `${Math.round(peakCust)} peak guests/day × ${v.walk}% fewer walkaways × $${v.ticket.toFixed(2)} × ${v.margin}% margin × ${v.days} days`, recovered],
+      ["Less food & milk waste", `$${v.waste}/day × ${v.wasteCut}% less × ${v.days} days`, waste],
+    ];
+    $("roiRows").innerHTML = rows.map(([l, d, a]) => `<tr><td>${l}<span class="detail">${esc(d)}</span></td><td class="amt ${a >= 0 ? "pos" : "neg"}">${a >= 0 ? "+" : ""}${money(a)}</td></tr>`).join("") +
+      `<tr><td><strong>Net gain per month</strong></td><td class="amt"><strong>${money(monthly)}</strong></td></tr>`;
+    const payback = monthly > 0 ? Math.ceil(v.setup / (monthly / v.days)) : null;
+    $("roiTotal").innerHTML =
+      `<div><span>First year, after setup</span><b class="num">${money(monthly * 12 - v.setup)}</b></div>` +
+      `<div><span>Return on added labor + setup</span><b class="num">${invest > 0 ? Math.round(((ret - invest) / invest) * 100) + "%" : "–"}</b></div>` +
+      `<div><span>Setup pays back in</span><b class="num">${payback != null ? payback + (payback === 1 ? " day" : " days") : "–"}</b></div>`;
+  }
+
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-scenario]");
+    if (!b) return;
+    const m = b.dataset.scenario;
+    state.sample = m === "on" ? true : m === "off" ? false : !state.sample;
+    renderDash(); renderIdeas();
+  });
+
+  function renderAll() { renderToday(); renderDash(); renderIdeas(); }
+
+
+  /* ---------- boot ---------- */
+  const hash = location.hash.slice(1);
+  let startTab = VIEWS.includes(hash) ? hash : null;
+  if (!startTab) { try { startTab = localStorage.getItem("bh-tab"); } catch {} }
+  show(startTab || "rate");
+  renderAll(); renderActive(); updateRateButton(); updateQuick();
+  connect().catch(() => { store.mode = "local"; setStatus("local"); startSubscriptions(); });
+})();
+</script>
+</body>
+</html>
